@@ -26,6 +26,7 @@ with open('secret', 'r') as fin:
 
 betk = tk = totp.now()
 print(tk)
+pyperclip.copy(tk)
 while True:
     time.sleep(1)
     tk = totp.now()
