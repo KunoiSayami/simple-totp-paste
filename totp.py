@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # totp.py
-# Copyright (C) 2019 KunoiSayami
+# Copyright (C) 2019-2020 KunoiSayami
 #
 # This module is part of simple-totp-paste and is released under
 # the AGPL v3 License: https://www.gnu.org/licenses/agpl-3.0.txt
@@ -17,21 +17,35 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
-import pyotp
-import pyperclip
+import sys
 import time
 
-with open('secret', 'r') as fin:
-    totp = pyotp.TOTP(fin.read().splitlines()[0])
+import pyotp
+import pyperclip
 
-betk = tk = totp.now()
-print(tk)
-pyperclip.copy(tk)
-while True:
-    time.sleep(1)
-    tk = totp.now()
-    if tk == betk:
-        continue
-    pyperclip.copy(tk)
-    print(tk)
-    betk = tk
+
+def run(_continue: bool=False):
+	with open('secret', 'r') as fin:
+		totp = pyotp.TOTP(fin.read().splitlines()[0])
+
+	if _continue:
+		print('This program will continue copy totp code to clipboard,\npress Control+C to terminate is program.\n')
+
+	betk = tk = totp.now()
+	print(tk)
+	pyperclip.copy(tk)
+	while _continue:
+		try:
+			time.sleep(5)
+		except KeyboardInterrupt:
+			pyperclip.copy('')
+			break
+		tk = totp.now()
+		if tk == betk:
+			continue
+		pyperclip.copy(tk)
+		print(tk)
+		betk = tk
+
+if __name__ == "__main__":
+	run(len(sys.argv) == 2 and sys.argv[1] == '-t')
