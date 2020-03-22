@@ -24,9 +24,11 @@ import pyotp
 import pyperclip
 
 
-def run(_continue: bool=False):
-	with open('secret', 'r') as fin:
-		totp = pyotp.TOTP(fin.read().splitlines()[0])
+def run(token: str ='', _continue: bool=False):
+	if token == '':
+		with open('secret', 'r') as fin:
+			token = fin.read().splitlines()[0]
+	totp = pyotp.TOTP(token)
 
 	if _continue:
 		print('This program will continue copy totp code to clipboard,\npress Control+C to terminate is program.\n')
@@ -48,4 +50,12 @@ def run(_continue: bool=False):
 		betk = tk
 
 if __name__ == "__main__":
-	run(len(sys.argv) == 2 and sys.argv[1] == '-t')
+	if len(sys.argv) == 1:
+		run()
+	elif len(sys.argv) == 2:
+		if sys.argv[1] == '-t':
+			run(_continue=True)
+		else:
+			run(sys.argv[1])
+	else:
+		run(sys.argv[1], '-t' in sys.argv)
